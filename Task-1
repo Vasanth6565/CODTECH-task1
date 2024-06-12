@@ -1,0 +1,200 @@
+#Task Overview
+The task at hand is a sentiment analysis of tweets using machine learning. Sentiment analysis involves classifying text data (in this case, tweets) into different sentiment categories such as positive, negative, or neutral. Here, the goal is to classify tweets as either positive or negative.
+
+Step-by-Step Explanation
+Import Libraries:
+
+The code starts by importing necessary libraries such as pandas, numpy, sklearn (for machine learning), and matplotlib (for visualization).
+Load the Dataset:
+
+The dataset is loaded using pandas.read_csv(). The dataset is a CSV file where each row represents a tweet and its corresponding sentiment label.
+The dataset is expected to have two columns: sentiment (the label) and text (the tweet).
+Data Preprocessing:
+
+The data is split into two variables: X (features, i.e., the tweet text) and y (target, i.e., the sentiment label).
+The dataset is then split into training and testing sets using train_test_split() from sklearn. This ensures that we have separate data for training the model and evaluating its performance.
+Convert Non-String Values:
+
+The test data is explicitly converted to strings to ensure compatibility with text processing steps.
+Feature Engineering: TF-IDF Vectorization:
+
+Text data is converted into numerical features using TF-IDF (Term Frequency-Inverse Document Frequency) vectorization. This step transforms the text into a matrix of numerical values that represent the importance of each word in the corpus.
+max_features=5000 specifies that only the top 5000 words by importance are considered.
+Handle Missing Values:
+
+The code checks for and handles missing values by dropping rows with missing labels. This ensures the data used for training is clean.
+Encode Labels:
+
+The sentiment labels are encoded into numerical values using LabelEncoder. This is necessary because most machine learning models require numerical input.
+The labels are converted to a categorical data type if they are not already.
+Train the Model:
+
+A logistic regression model is instantiated and trained on the vectorized training data (X_train_vectorized).
+Make Predictions:
+
+The trained model is used to predict the sentiment of the test data (X_test_vectorized).
+Evaluate the Model:
+
+The model's performance is evaluated using metrics such as accuracy, precision, recall, and F1 score. These metrics provide a comprehensive view of how well the model is performing.
+Accuracy measures the overall correctness of the model.
+Precision measures how many of the predicted positive instances are actually positive.
+Recall measures how many of the actual positive instances were correctly predicted.
+F1 score is the harmonic mean of precision and recall, providing a single metric that balances both concerns.
+Visualization:
+
+The performance metrics are visualized using a bar chart for better interpretability. This helps in quickly assessing the model's performance visually.
+
+
+
+#Import Libraries
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+
+
+# Load the dataset
+data = pd.read_csv(r"C:\Users\Vasanth\Downloads\archive (12)\training.1600000.processed.noemoticon.csv", 
+encoding='latin-1', header=None, usecols=[0, 5], names=['sentiment', 'text'])
+
+
+
+print(data)
+print(data.head())
+print(data.tail())
+
+
+
+# Data preprocessing
+X = data['text']
+y = data['sentiment']
+
+
+
+#Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+
+
+# Convert all non-string values to string in X_test
+X_test = X_test.astype(str)
+
+
+
+# Feature engineering: TF-IDF Vectorization
+vectorizer = TfidfVectorizer(max_features=5000)
+X_train_vectorized = vectorizer.fit_transform(X_train)
+X_test_vectorized = vectorizer.transform(X_test)
+
+
+
+# Align indices of X_train and y_train
+X_train.reset_index(drop=True, inplace=True)
+y_train.reset_index(drop=True, inplace=True)
+
+# Drop rows with missing values
+X_train = X_train[~y_train.isnull()]
+y_train = y_train.dropna()
+
+
+
+# Drop rows with missing values
+X_train.reset_index(drop=True, inplace=True)  # Reset index
+X_train = X_train[~y_train.isnull()]
+y_train = y_train.dropna()
+
+
+
+# Check for missing values in y_train
+missing_values = y_train.isnull().sum()
+print("Number of missing values in y_train:", missing_values)
+
+
+
+# Drop rows with missing values
+X_train = X_train[~y_train.isnull()]
+y_train = y_train.dropna()
+
+
+
+# Reindex y_train after dropping rows
+y_train.reset_index(drop=True, inplace=True)
+
+
+
+# Re-vectorize X_train after dropping rows
+vectorizer = TfidfVectorizer(max_features=5000, lowercase=True, stop_words='english')
+X_train_vectorized = vectorizer.fit_transform(X_train)
+
+
+
+print("Data type of y_train:", y_train.dtype)
+
+
+
+if y_train.dtype != 'int' and y_train.dtype.name != 'category':
+    y_train = y_train.astype('category')
+
+
+print("Unique values in y_train:", y_train.unique())
+
+
+y_train = y_train.astype(str)
+
+
+label_encoder = LabelEncoder()
+y_train_encoded = label_encoder.fit_transform(y_train)
+
+
+
+model = LogisticRegression(max_iter=1000)
+model.fit(X_train_vectorized, y_train_encoded)
+
+
+
+print("Data type of y_test:", type(y_test))
+print("Data type of y_pred:", type(y_pred))
+
+
+
+y_test_str = y_test.astype(str)
+y_pred_str = y_pred.astype(str)
+
+
+print("Unique values in y_test:", np.unique(y_test_str))
+print("Unique values in y_pred:", np.unique(y_pred_str))
+
+
+accuracy = accuracy_score(y_test_str, y_pred_str)
+precision = precision_score(y_test_str, y_pred_str, average='weighted')
+recall = recall_score(y_test_str, y_pred_str, average='weighted')
+f1 = f1_score(y_test_str, y_pred_str, average='weighted')
+
+
+# Model evaluation
+print("Accuracy:", accuracy)
+print("Precision:", precision)
+print("Recall:", recall)
+print("F1 Score:", f1)
+
+
+#visualization
+metrics = ['Accuracy', 'Precision', 'Recall', 'F1 Score']
+values = [0.7192284767422454, 0.5809553093172667, 0.7192284767422454, 0.6427392906381811]
+plt.figure(figsize=(8, 6))
+plt.bar(metrics, values, color=['blue', 'green', 'orange', 'red'])
+plt.title('Performance Metrics')
+plt.xlabel('Metrics')
+plt.ylabel('Value')
+plt.show()
+
+
+
+
+
+
+
