@@ -17,7 +17,7 @@ Mentor: Sravani Gouni
 
 
 
-Task: DATA PROCESSING
+Task: NATURAL LANGUAGE PROCESSING (NLP)
 
 
 
