@@ -10,6 +10,7 @@ Duration: May to 25th June
 
 Mentor: Sravani Gouni
 
+Task: DATA PROCESSING
 
 Project Overview: 
 **Sentiment Analysis of Tweets**
